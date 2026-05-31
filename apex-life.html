@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0e0c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="APEX LIFE">
+<title>APEX LIFE</title>
+<link rel="manifest" href="manifest.json">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;overflow:hidden;-webkit-text-size-adjust:none;text-size-adjust:none}
+body{
+  font-family:'Courier New',Courier,monospace;
+  background:#0f0e0c;color:#e8e5db;
+  display:flex;flex-direction:column;
+  max-width:600px;margin:0 auto;
+  height:100dvh;overflow:hidden;
+}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#2d2b27;border-radius:2px}
+
+/* ── Layout shells ── */
+#header{background:#171614;border-bottom:1px solid #2d2b27;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#tabs{display:flex;border-bottom:1px solid #2d2b27;background:#171614;flex-shrink:0;overflow-x:auto}
+#daybar{display:flex;gap:6px;padding:10px 14px;background:#171614;overflow-x:auto;border-bottom:1px solid #2d2b27;flex-shrink:0}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pad{padding:12px 14px 100px}
+
+/* ── Tabs ── */
+.tab{flex:1;padding:11px 4px;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:monospace;font-size:11px;letter-spacing:.5px;color:#5a5852;min-width:0;white-space:nowrap;transition:color .15s}
+.tab.active{border-bottom:2px solid #BA7517;color:#f0a830}
+
+/* ── Day buttons ── */
+.daybtn{padding:7px 11px;border-radius:8px;border:none;cursor:pointer;font-family:monospace;font-size:11px;background:#252320;color:#9a9790;white-space:nowrap;min-height:34px;transition:background .15s}
+.daybtn.sel{background:#BA7517;color:#fff;font-weight:700}
+
+/* ── Schedule rows ── */
+.srow{display:flex;gap:10px;padding:12px 13px;background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;cursor:pointer;align-items:flex-start;min-height:52px;margin-bottom:6px;transition:border-color .15s;border-left-width:3px}
+.srow.open{border-color:#BA7517}
+.srow.done{opacity:.35}
+.srow.t-routine{border-left-color:#58565e}
+.srow.t-mental{border-left-color:#7265c8}
+.srow.t-hygiene{border-left-color:#1a9070}
+.srow.t-workout{border-left-color:#BA7517}
+.srow.t-nutrition{border-left-color:#5d9020}
+.srow.t-academic{border-left-color:#2e7ab8}
+.srow.t-project{border-left-color:#BA7517}
+.srow.t-sleep{border-left-color:#2e7ab8}
+.srow.t-recovery{border-left-color:#a84060}
+.stime{font-size:11px;color:#5a5852;min-width:42px;padding-top:2px;letter-spacing:.3px;flex-shrink:0}
+.sbody{flex:1;min-width:0}
+.slabel{font-size:14px;font-weight:600;color:#e8e5db;line-height:1.3}
+.slabel.done{color:#5a5852;text-decoration:line-through}
+.sdetail{font-size:12px;color:#9a9790;margin-top:8px;line-height:1.6;padding-top:8px;border-top:1px solid #2d2b27;display:none}
+.srow.open .sdetail{display:block}
+.sacts{display:flex;gap:7px;align-items:flex-start;flex-shrink:0;padding-top:1px}
+
+/* ── Exercise rows ── */
+.exrow{padding:12px 13px;margin-bottom:6px;background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;cursor:pointer;transition:border-color .15s}
+.exrow.open{border-color:#BA7517}
+.exrow.done{opacity:.35}
+.exhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.exname{font-size:14px;font-weight:600;color:#e8e5db}
+.exname.done{color:#5a5852;text-decoration:line-through}
+.exsets{font-size:12px;color:#BA7517;margin-top:3px}
+.exdetail{font-size:12px;color:#9a9790;margin-top:8px;padding-top:8px;border-top:1px solid #2d2b27;line-height:1.6;display:none}
+.exrow.open .exdetail{display:block}
+
+/* ── Buttons ── */
+.chk{width:28px;height:28px;border:1px solid #2d2b27;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#5c8f20;background:#1e1d1a;cursor:pointer;flex-shrink:0;transition:background .15s,border-color .15s}
+.chk.done{background:#182210;border-color:#5c8f20}
+.delbtn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#5a5852;cursor:pointer;border-radius:5px;background:#252320;border:none;flex-shrink:0;line-height:1}
+.addbtn{width:100%;padding:13px;background:transparent;border:1px dashed #2d2b27;border-radius:10px;color:#5a5852;font-family:monospace;font-size:12px;cursor:pointer;margin-top:4px;letter-spacing:1px}
+.addform{background:#1e1d1a;border:1px solid #BA7517;border-radius:12px;padding:16px;margin-top:6px}
+.inp{background:#252320;border:1px solid #2d2b27;border-radius:8px;padding:9px 11px;color:#e8e5db;font-family:monospace;font-size:13px;outline:none;width:100%;transition:border-color .15s}
+.inp:focus{border-color:#BA7517}
+.btnprimary{flex:1;padding:11px;background:#BA7517;border:none;border-radius:8px;color:#fff;font-family:monospace;font-size:12px;font-weight:700;cursor:pointer}
+.btncancel{padding:11px 16px;background:#252320;border:1px solid #2d2b27;border-radius:8px;color:#9a9790;font-family:monospace;font-size:12px;cursor:pointer}
+
+/* ── Note box ── */
+.notebox{font-size:12px;color:#f0a830;padding:10px 13px;background:#221606;border-radius:8px;margin-top:10px;line-height:1.5;border:1px solid #3d2208}
+
+/* ── Projects ── */
+.projhdr{background:#1e1d1a;border:1px solid #BA7517;border-radius:10px;padding:14px;margin-bottom:12px}
+.weekbar{margin-top:10px;height:4px;background:#252320;border-radius:2px;overflow:hidden}
+.weekfill{height:100%;background:#BA7517;border-radius:2px;transition:width .5s}
+
+/* ── Milestones ── */
+.msrow{display:flex;gap:10px;padding:9px 11px;margin-bottom:5px;border-radius:8px;cursor:pointer;align-items:center;border:1px solid #2d2b27;transition:opacity .15s}
+.msrow:active{opacity:.7}
+
+/* ── Info ── */
+.infocard{background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;padding:14px;margin-bottom:8px}
+.infotitle{font-size:10px;letter-spacing:2px;color:#f0a830;margin-bottom:10px;font-weight:700}
+.inforow{font-size:12px;color:#9a9790;margin-bottom:6px;padding-left:10px;border-left:2px solid #2d2b27;line-height:1.6}
+
+/* ── Chat ── */
+#chatscroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:12px}
+#chatform{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #2d2b27;background:#171614;flex-shrink:0}
+.bubble{max-width:88%;padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.7;word-break:break-word}
+.bubble.user{background:#221606;border:1px solid #3d2208;color:#f0a830;border-bottom-right-radius:3px;margin-left:auto}
+.bubble.ai{background:#1e1d1a;border:1px solid #2d2b27;color:#e8e5db;border-bottom-left-radius:3px}
+.ailabel{font-size:9px;letter-spacing:1.5px;color:#BA7517;margin-bottom:5px;font-weight:700}
+.sendbtn{padding:11px 16px;background:#BA7517;border:none;border-radius:10px;color:#fff;font-family:monospace;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.sendbtn:disabled{opacity:.4;cursor:not-allowed}
+#chatinput{flex:1;background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;padding:11px 13px;color:#e8e5db;font-family:monospace;font-size:13px;outline:none}
+#chatinput:focus{border-color:#BA7517}
+
+/* ── Misc ── */
+.lbl{font-size:10px;letter-spacing:2px;color:#5a5852;padding-bottom:10px}
+.resetbtn{width:100%;padding:12px;background:transparent;border:1px solid #2d2b27;border-radius:10px;color:#5a5852;font-family:monospace;font-size:11px;cursor:pointer;letter-spacing:1px;margin-bottom:8px;margin-top:4px}
+.wplanrow{display:flex;gap:12px;padding:12px 13px;margin-bottom:6px;background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;cursor:pointer;align-items:center;min-height:52px;transition:border-color .15s}
+.wplanrow.today{border:1.5px solid #BA7517}
+
+/* ── API key screen ── */
+#apiscreen{position:fixed;inset:0;background:#0f0e0c;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;z-index:100;display:none}
+.apicard{background:#1e1d1a;border:1px solid #BA7517;border-radius:16px;padding:28px;max-width:400px;width:100%}
+</style>
+</head>
+<body>
+
+<!-- API Key setup screen (shown on first coach tab open if no key saved) -->
+<div id="apiscreen">
+  <div class="apicard">
+    <div style="font-size:18px;font-weight:700;letter-spacing:3px;color:#e8e5db;margin-bottom:6px">APEX COACH</div>
+    <div style="font-size:11px;color:#9a9790;letter-spacing:1px;margin-bottom:20px">AI SETUP REQUIRED</div>
+    <div style="font-size:12px;color:#9a9790;margin-bottom:16px;line-height:1.7">
+      Enter your <strong style="color:#f0a830">OpenRouter API key</strong> to enable the coach.<br>
+      Get one free at <strong style="color:#BA7517">openrouter.ai</strong> — it works with many free models.<br><br>
+      Your key is saved locally on this device only.
+    </div>
+    <input class="inp" id="apikeyinput" type="password" placeholder="sk-or-v1-..." style="margin-bottom:12px">
+    <div style="display:flex;gap:8px">
+      <button class="btnprimary" onclick="saveApiKey()">SAVE KEY</button>
+      <button class="btncancel" onclick="closeApiScreen()">SKIP</button>
+    </div>
+    <div style="font-size:11px;color:#5a5852;margin-top:12px;line-height:1.6">
+      Model used: <span style="color:#BA7517">google/gemini-flash-1.5</span> (free tier)<br>
+      Schedule editing fully works offline without a key.
+    </div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="header">
+  <div>
+    <div style="font-size:21px;font-weight:700;letter-spacing:4px;color:#e8e5db">APEX LIFE</div>
+    <div id="subtitle" style="font-size:10px;color:#5a5852;letter-spacing:2px;margin-top:2px">ISHAN · SUMMER 2026</div>
+  </div>
+  <div style="text-align:right">
+    <div id="pctdisp" style="font-size:30px;font-weight:700;color:#BA7517">0%</div>
+    <div id="daysdisp" style="font-size:9px;color:#5a5852;letter-spacing:1px">– d LEFT</div>
+  </div>
+</div>
+
+<div id="tabs">
+  <button class="tab active" data-tab="today" onclick="setTab('today')">TODAY</button>
+  <button class="tab" data-tab="workout" onclick="setTab('workout')">WORKOUT</button>
+  <button class="tab" data-tab="projects" onclick="setTab('projects')">PROJECTS</button>
+  <button class="tab" data-tab="coach" onclick="setTab('coach')">COACH AI</button>
+  <button class="tab" data-tab="info" onclick="setTab('info')">INFO</button>
+</div>
+
+<div id="daybar"></div>
+<div id="content"></div>
+
+<script>
+'use strict';
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const FULL_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const TYPES = ['routine','mental','hygiene','workout','nutrition','academic','project','sleep','recovery'];
+
+const SCHEDULE_WEEKDAY = [
+  {time:'7:00', label:'Wake up — no snooze', type:'routine'},
+  {time:'7:03', label:'Visualization 3 min', type:'mental', detail:'Picture the best version of you. The feeling behind the goals — not the goals themselves. Eyes closed. Before touching your phone.'},
+  {time:'7:08', label:'Face debloat ritual', type:'hygiene', detail:'Oil → knuckle ears → scalp massage → scrape sides of neck → knuckle jawline → knuckle neck → fingers around eyes. Push tongue up 1 min (double chin fix). Push cheeks from sides.'},
+  {time:'7:20', label:'Workout (see Workout tab)', type:'workout'},
+  {time:'8:45', label:'Shower 1', type:'hygiene', detail:'Cold finish. Full wash.'},
+  {time:'8:55', label:'Skincare + oral hygiene', type:'hygiene', detail:'Toner → Moisturizer → Sunscreen. Brush → Floss → Tongue scrape. Fragrance with Vaseline base. Shave/trim.'},
+  {time:'9:15', label:'Creatine 5g + high-protein breakfast', type:'nutrition', detail:"Creatine with water first. Big breakfast. Whey if insufficient. 53kg at 5'10\" = eat more than feels natural, every single day."},
+  {time:'9:30', label:'Deep Work Block 1 — Projects', type:'project', detail:'2.5 hrs. Priority: MIA V2 inference script → Streamlit → Trading bot pipeline. No phone. Pomodoro 25/5. Ship something concrete every session.'},
+  {time:'12:00', label:'Lunch + hydrate', type:'nutrition', detail:'High protein lunch. 500ml water immediately.'},
+  {time:'13:00', label:'Certs / MIT OCW / Reading', type:'academic', detail:'Google AI Essentials → GitHub Essentials → IBM CyberSec → Claude Architect. Or MIT OpenCourseWare. 1.5 hrs.'},
+  {time:'14:30', label:'Break — walk outside', type:'recovery', detail:'15–20 min. Sunlight. Ideally phone-free.'},
+  {time:'15:00', label:'Deep Work Block 2 — optional', type:'project', detail:'Fellowship research, GitHub polish, internship applications. Skip entirely if brain is dead.'},
+  {time:'16:30', label:'APT fix + foam roll', type:'recovery', detail:'APT wall fix if missed morning. Foam roll tight areas. 15 min.'},
+  {time:'18:00', label:'Evening walk / light mobility', type:'recovery', detail:'30 min walk. Low-intensity cardio + mental reset combined.'},
+  {time:'20:00', label:'Shower 2', type:'hygiene', detail:'Warm. Oral hygiene. Retinol at night. Shave if needed.'},
+  {time:'20:30', label:'Reading — books', type:'mental', detail:'Psycho-Cybernetics, Naval Almanac, War of Art, Meditations (Aurelius), Dostoevsky. 30–40 min minimum.'},
+  {time:'21:15', label:'Internship / fellowship research', type:'academic', detail:'handshake.com, jobright.ai, underclassmen internship list. Check deadlines. Polish GitHub profile.'},
+  {time:'22:00', label:'Kandel journal — 5 min', type:'mental', detail:'Write ONE moment today where you acted like the person you want to become. Specific behavior = specific synapse.'},
+  {time:'22:30', label:'Sleep — 8hr target', type:'sleep'},
+];
+
+const SCHEDULE_SATURDAY = [
+  {time:'8:00', label:'Wake up', type:'routine'},
+  {time:'8:10', label:'Face debloat ritual', type:'hygiene', detail:'Full ritual. No rush.'},
+  {time:'8:25', label:'Full workout session', type:'workout'},
+  {time:'10:20', label:'Shower + full skincare', type:'hygiene'},
+  {time:'10:50', label:'Breakfast + supplements', type:'nutrition', detail:'Big breakfast. Whey. Creatine. Eat well.'},
+  {time:'11:00', label:'Main project session — no interruptions', type:'project', detail:'3 focused hours. Biggest task on the board. Most important technical work of the week.'},
+  {time:'14:00', label:'Lunch + rest', type:'nutrition'},
+  {time:'15:00', label:'Weekly review + plan', type:'mental', detail:'What shipped? What blocked? Update milestones. Check fellowship deadlines. Set 3 non-negotiables for next week.'},
+  {time:'16:00', label:'Walk or outdoor time', type:'recovery'},
+  {time:'20:00', label:'Shower 2', type:'hygiene'},
+  {time:'21:00', label:'Kandel journal + plan next week', type:'mental'},
+  {time:'22:30', label:'Sleep', type:'sleep'},
+];
+
+const SCHEDULE_SUNDAY = [
+  {time:'8:30', label:'Wake up — rest day', type:'routine'},
+  {time:'9:00', label:'Recovery session', type:'workout'},
+  {time:'10:00', label:'Shower + full skincare', type:'hygiene'},
+  {time:'10:30', label:'Breakfast + supplements', type:'nutrition'},
+  {time:'11:00', label:'Reading / philosophy', type:'mental', detail:'Psycho-Cybernetics, Naval, War of Art. Marcus Aurelius. Dostoevsky. One chapter minimum.'},
+  {time:'14:00', label:'Rest — no screens if possible', type:'recovery', detail:'Mandatory. Brain consolidates during actual rest. Go outside.'},
+  {time:'16:00', label:'Week prep', type:'routine', detail:'Groceries, meal prep, workspace setup. Set 3 non-negotiable tasks for next week. Check fellowship deadlines.'},
+  {time:'20:00', label:'Shower 2 + prep for week', type:'hygiene'},
+  {time:'21:00', label:'Kandel journal', type:'mental'},
+  {time:'22:30', label:'Sleep', type:'sleep'},
+];
+
+const WORKOUT_UPPER = {
+  name:'UPPER — MASS', dur:'70 min', focus:'Hypertrophy + arm size',
+  note:'Goal: GAIN mass. 53kg is underweight. 3-sec negatives every rep. Whey within 30 min. 2000+ cal/day minimum.',
+  ex:[
+    {n:'Wrist circuit', s:'1', r:'Full', d:'Palms forward → facing you → reverse → finger pulses half + full. Forearm health before everything.'},
+    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'3 points touching wall. Bend knee till lower back touches naturally. Non-negotiable every session.'},
+    {n:'DB chest press', s:'4', r:'10–12', d:'7.5kg. Full range. 3-sec negative. Slight arch. Main chest mass builder.'},
+    {n:'Incline pushups', s:'3', r:'15', d:'Upper chest. Slow negative. Full range.'},
+    {n:'DB pullovers', s:'3', r:'12', d:'10kg. Reach back full extension. Rib cage expansion + lat width.'},
+    {n:'Hindu pushups', s:'3', r:'10–12', d:'Shoulder mass + mobility. Dive through, hold at bottom.'},
+    {n:'Single arm press', s:'3', r:'10 each', d:'5kg. Functional shoulder strength. Core braced throughout.'},
+    {n:'Gorilla rows', s:'4', r:'12 each', d:'7.5–10kg. Back mass. Explosive pull, squeeze at top.'},
+    {n:'Meadows rows', s:'3', r:'10 each', d:'Elbow high. Lat isolation. Band or DB.'},
+    {n:'Bicep curls', s:'3', r:'12–15', d:'5–7.5kg. 3-sec negative. Supinate at top. Arm mass.'},
+    {n:'Skull crushers', s:'3', r:'12', d:'3–5kg. Tricep mass. Elbow stays fixed.'},
+    {n:'Floor pulses + wrist rotation', s:'2', r:'30+20', d:'Forearm size. Knuckle pulses on floor then 3kg wrist rotations each way.'},
+    {n:'Dead hang', s:'2', r:'45–60 sec', d:'Daily. Left shoulder + spinal decompression.'},
+    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Left shoulder. Daily non-negotiable.'},
+  ]
+};
+
+const WORKOUT_LOWER = {
+  name:'LOWER — MASS + POSTURE', dur:'65 min', focus:'Leg mass + APT correction',
+  note:'APT fix takes 6–12 months of daily work. Leg mass responds fast. Both goals are served here.',
+  ex:[
+    {n:'90/90s + wrist circuit', s:'1', r:'30 reps + full', d:'Hip mobility 30 reps first. Wrist circuit. Both required.'},
+    {n:'APT wall fix — extended', s:'4', r:'60 sec hold', d:'Longer holds on lower days. Breathe in through nose into belly. This is your main posture fix.'},
+    {n:'Bulgarian split squats', s:'4', r:'10–12 each', d:'Bodyweight or 5kg. 3-sec negative. Main quad + glute mass builder.'},
+    {n:'Sissy squats', s:'3', r:'12–15', d:'Lean back. Knees forward. Quad isolation. Deeper every week.'},
+    {n:'RDL extensions', s:'3', r:'12', d:'7.5–10kg. Hinge hips. Hamstring fully loaded. Slow negative.'},
+    {n:'Zercher squats', s:'3', r:'8–10', d:'12kg barbell. Core braced. Full depth. Postural strength.'},
+    {n:'Copenhagen plank', s:'3', r:'20–30 sec each', d:'Inner thigh + core. Injury prevention.'},
+    {n:'Hollow holds', s:'3', r:'Till failure', d:'Lower back flat to floor. Long-term APT correction.'},
+    {n:'Pike pushup core', s:'3', r:'50 reps', d:'Feet on chair, arms on floor, pike position. Hips up/down bending knee. Posture + conditioning.'},
+    {n:'Seesaw', s:'3', r:'12', d:'Core rotation. Controlled throughout.'},
+    {n:'Dead hang', s:'2', r:'1 min', d:'Daily. Spinal decompression. Posture.'},
+  ]
+};
+
+const WORKOUT_CORE_MOB = {
+  name:'CORE + MOBILITY', dur:'45 min', focus:'Active recovery + Posture repair',
+  note:"Mid-week recovery. Low intensity only. This session fixes your body — don't turn it into a strength session.",
+  ex:[
+    {n:'Foam roller — full body', s:'1', r:'7 min', d:'Quads → hamstrings → calves → upper back → lats. 60 sec per area.'},
+    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'Every single day without exception.'},
+    {n:'Wrist mobility full circuit', s:'1', r:'Complete', d:'All 4 positions + finger pulses.'},
+    {n:'90/90s', s:'2', r:'30 reps', d:'Hip mobility. APT correction.'},
+    {n:'Cobra stretch + shoulder roll', s:'2', r:'30 reps', d:'Spine + left shoulder care.'},
+    {n:'Scorpion stretch', s:'2', r:'12 each', d:'Hip + spine rotation.'},
+    {n:'Wood choppers', s:'3', r:'12 each side', d:'Resistance band. Rotational core.'},
+    {n:'Pendulum swings', s:'3', r:'10 each', d:'Hip drive. Controlled movement.'},
+    {n:'Ab rollers', s:'3', r:'8–10', d:'Full extension if possible. Best core exercise.'},
+    {n:'Dead hangs', s:'3', r:'1 min', d:'Daily. Left shoulder.'},
+    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Left shoulder. Non-negotiable.'},
+    {n:'2-min mobility circuit', s:'2', r:'Full', d:'Squat knees out → squat sits → deep lunge chest to ground → downdog 5 pulses → squat rotate'},
+  ]
+};
+
+const WORKOUT_SATURDAY = {
+  name:'SATURDAY — FULL SESSION', dur:'90–100 min', focus:'All qualities + posture',
+  note:'Full warmup mandatory. No time pressure. Main development session of the week. Eat well after.',
+  ex:[
+    {n:'Full warmup sequence', s:'1', r:'Complete', d:'Dead hangs 2–3min → foam roller 7min → 90/90s 30 reps → knee pullovers 8 → cobra+shoulder roll 30 → scorpion 12 → squat ext 8 → squat sits 15 → shoulder 90s → cross-arm 30s → hip+quad bounces 20'},
+    {n:'APT wall fix', s:'4', r:'60 sec hold', d:'Saturday = maximum posture work. Longest holds of the week.'},
+    {n:'Strength block', s:'—', r:'Upper or lower — less done this week', d:'Full sets. Pick whichever you did fewer times this week.'},
+    {n:'V-ups', s:'3', r:'15–20', d:'Abs. Full range. No momentum.'},
+    {n:'Reverse crunches', s:'3', r:'15–20', d:'Lower abs. Tilt pelvis at top.'},
+    {n:'Seal-ups', s:'3', r:'12', d:'Back extension. Spine health.'},
+    {n:'Pull-ups / doorway curls', s:'3', r:'Till failure', d:'Back width. Doorway bicep curls if no bar.'},
+    {n:'Dips till failure', s:'3', r:'Failure', d:'Triceps + chest. Lock at top.'},
+    {n:'Long walk — 40–60 min', s:'1', r:'Easy pace', d:'Aerobic base + mental reset. Do this after the session, not before.'},
+  ]
+};
+
+const WORKOUT_SUNDAY = {
+  name:'SUNDAY — RECOVERY', dur:'40 min', focus:'Repair + Posture',
+  note:'Quality rest = quality work all next week. Non-optional.',
+  ex:[
+    {n:'Foam roller — full body', s:'1', r:'7 min', d:'Quads → hamstrings → calves → IT band → upper back → lats.'},
+    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'Every day. Non-negotiable.'},
+    {n:'Dead hangs', s:'3', r:'1–2 min', d:'Daily. Left shoulder + spine.'},
+    {n:'90/90s', s:'2', r:'30 reps', d:'Hip mobility.'},
+    {n:'Knee pullovers', s:'2', r:'8 reps', d:''},
+    {n:'Cobra + shoulder roll', s:'2', r:'30 reps', d:'Spine + left shoulder.'},
+    {n:'Scorpion stretch', s:'2', r:'12 each', d:'Full rotation.'},
+    {n:'Hip + quad bounces', s:'2', r:'20 reps', d:''},
+    {n:'Wrist circuit', s:'1', r:'Complete', d:'All 4 positions.'},
+  ]
+};
+
+function getWorkout(day) {
+  switch(day) {
+    case 0: return WORKOUT_SUNDAY;
+    case 1: return WORKOUT_UPPER;
+    case 2: return WORKOUT_LOWER;
+    case 3: return WORKOUT_CORE_MOB;
+    case 4: return WORKOUT_UPPER;
+    case 5: return WORKOUT_LOWER;
+    case 6: return WORKOUT_SATURDAY;
+    default: return WORKOUT_CORE_MOB;
+  }
+}
+
+const PROJECTS = [
+  {id:'mia', name:'MIA V2', color:'#7265c8', desc:'AI companion · inference → Streamlit', milestones:[
+    {label:'Commit V2 notebook + clean repo structure', week:1},
+    {label:'Working inference script (no hardcoding)', week:2},
+    {label:'Streamlit interface live + shareable link', week:3},
+    {label:'V1 postmortem doc + polished README', week:4},
+  ]},
+  {id:'trading', name:'TRADING BOT', color:'#BA7517', desc:'Indian market pipeline · nsepy → model', milestones:[
+    {label:'nsepy + dotenv + SQLite upsert pipeline', week:3},
+    {label:'Data validation + feature engineering', week:4},
+    {label:'Model baseline — NOT Streamlit yet', week:5},
+  ]},
+  {id:'certs', name:'CERTIFICATIONS', color:'#5c8f20', desc:'Free certs for career profile', milestones:[
+    {label:'GitHub Student Pack — Cursor Pro + Copilot active', week:1},
+    {label:'Google AI Essentials complete', week:4},
+    {label:'GitHub Essentials complete', week:4},
+    {label:'IBM CyberSec (SkillsBuild) complete', week:6},
+    {label:'Claude Certified Architect complete', week:7},
+  ]},
+  {id:'apps', name:'APPLICATIONS', color:'#c04848', desc:'Fellowships + internship prep', milestones:[
+    {label:'GitHub profile + README polished', week:2},
+    {label:'Handshake + jobright.ai profiles complete', week:3},
+    {label:'MLH Fellowship application submitted', week:5},
+    {label:'CodePath / Keploy fellowship submitted', week:6},
+    {label:'IISC/INSA summer research inquiry sent', week:5},
+  ]},
+];
+
+const SUMMER_START = new Date(2026, 4, 29);
+function currentSummerWeek() {
+  const diff = Math.floor((new Date() - SUMMER_START) / (7 * 24 * 60 * 60 * 1000));
+  return Math.max(1, Math.min(diff + 1, 8));
+}
+function daysUntilSemester() {
+  const sem = new Date(2026, 6, 21);
+  return Math.max(0, Math.ceil((sem - new Date()) / (24 * 60 * 60 * 1000)));
+}
+function getSched(day) {
+  return day === 0 ? SCHEDULE_SUNDAY : day === 6 ? SCHEDULE_SATURDAY : SCHEDULE_WEEKDAY;
+}
+function dKey(day) { return day === 0 ? 'sunday' : day === 6 ? 'saturday' : 'weekday'; }
+function tMin(t) {
+  if (!t) return 0;
+  const parts = t.split(':').map(Number);
+  return (parts[0] || 0) * 60 + (parts[1] || 0);
+}
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+}
+function weekKey() {
+  const d = new Date();
+  const day = d.getDay();
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return monday.getFullYear() + '-' + monday.getMonth() + '-' + monday.getDate();
+}
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+function ls(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch(e) { return def; }
+}
+function ss(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+
+let S = {
+  tab: 'today',
+  selDay: new Date().getDay(),
+  expandedSched: null,
+  expandedEx: null,
+  showAdd: false,
+  newTask: { time:'', label:'', type:'routine', detail:'' },
+  chatInput: '',
+  loading: false,
+  // persistent
+  completed:     ls('apex_completed', {}),
+  projDone:      ls('apex_proj', {}),
+  sched:         ls('apex_sched', { added:{weekday:[],saturday:[],sunday:[]}, deleted:{weekday:[],saturday:[],sunday:[]} }),
+  chat:          ls('apex_chat', [{role:'assistant', content:'APEX Summer Mode active. 8 weeks, no commute, no excuses.\n\nStack is set: MIA V2 first → trading bot → certs → applications.\n\nAsk me about disruptions, schedule changes, or project decisions.'}]),
+  apiKey:        ls('apex_apikey', ''),
+};
+
+// ─── HELPER: merged schedule ──────────────────────────────────────────────────
+function getMerged(base, k, sched) {
+  const def = base
+    .map((item, i) => ({ ...item, _src:'def', _uid: 'def_' + i, _idx: i }))
+    .filter((_, i) => !(sched.deleted[k] || []).includes(i));
+  const add = (sched.added[k] || []).map(item => ({ ...item, _src:'add' }));
+  return [...def, ...add].sort((a, b) => tMin(a.time) - tMin(b.time));
+}
+
+// ─── HELPER: parse coach commands ────────────────────────────────────────────
+function parseCmds(text) {
+  const blockMatch = text.match(/---COMMANDS---([\s\S]*?)---END---/);
+  const clean = text.replace(/---COMMANDS---[\s\S]*?---END---/g, '').trim();
+  if (!blockMatch) return { clean: text.trim(), cmds: [] };
+  let cmds = [];
+  try { cmds = JSON.parse(blockMatch[1].trim()); } catch(e) { cmds = []; }
+  if (!Array.isArray(cmds)) cmds = [];
+  return { clean, cmds };
+}
+
+// ─── CORE RENDER ──────────────────────────────────────────────────────────────
+function render() {
+  const today = new Date().getDay();
+  const tk = todayKey();
+  const curWeek = currentSummerWeek();
+  const daysLeft = daysUntilSemester();
+
+  // header stats
+  const todayBase = getSched(today);
+  const todayK = dKey(today);
+  const todayMerged = getMerged(todayBase, todayK, S.sched);
+  const todayW = getWorkout(today);
+  const totalItems = todayMerged.length + todayW.ex.length;
+  const doneItems = [
+    ...todayMerged.map((_, i) => tk + '_s_' + i),
+    ...todayW.ex.map((_, i) => tk + '_w_' + i)
+  ].filter(k => S.completed[k]).length;
+  const pct = totalItems > 0 ? Math.round(doneItems / totalItems * 100) : 0;
+
+  document.getElementById('pctdisp').textContent = pct + '%';
+  document.getElementById('daysdisp').textContent = daysLeft + 'd LEFT';
+  document.getElementById('subtitle').textContent = 'ISHAN · SUMMER 2026 · WK ' + curWeek + '/8';
+
+  // tab active state
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === S.tab);
+  });
+
+  // day bar visibility
+  const showDayBar = !['coach','info','projects'].includes(S.tab);
+  const daybar = document.getElementById('daybar');
+  daybar.style.display = showDayBar ? 'flex' : 'none';
+  if (showDayBar) {
+    daybar.innerHTML = DAYS.map((d, i) =>
+      `<button class="daybtn${S.selDay === i ? ' sel' : ''}" onclick="setDay(${i})">${d}</button>`
+    ).join('');
+  }
+
+  // render active tab
+  const content = document.getElementById('content');
+  switch(S.tab) {
+    case 'today':    renderToday(content, today, tk); break;
+    case 'workout':  renderWorkout(content, today, tk); break;
+    case 'projects': renderProjects(content, curWeek, daysLeft); break;
+    case 'coach':    renderCoach(content); break;
+    case 'info':     renderInfo(content, today, tk); break;
+  }
+}
+
+// ─── TODAY TAB ────────────────────────────────────────────────────────────────
+function renderToday(el, today, tk) {
+  const viewBase = getSched(S.selDay);
+  const viewK = dKey(S.selDay);
+  const viewMerged = getMerged(viewBase, viewK, S.sched);
+
+  let html = '<div class="pad">';
+  html += `<div class="lbl">${FULL_DAYS[S.selDay].toUpperCase()} &nbsp;·&nbsp; SCHEDULE</div>`;
+
+  viewMerged.forEach((item, i) => {
+    const ck = tk + '_s_' + i;
+    const done = !!S.completed[ck];
+    const open = S.expandedSched === i;
+    const hasDetail = item.detail && item.detail.trim();
+    html += `<div class="srow t-${item.type}${open ? ' open' : ''}${done ? ' done' : ''}" onclick="toggleSched(${i})">
+      <div class="stime">${esc(item.time)}</div>
+      <div class="sbody">
+        <div class="slabel${done ? ' done' : ''}">${esc(item.label)}</div>
+        ${hasDetail ? `<div class="sdetail">${esc(item.detail)}</div>` : ''}
+      </div>
+      <div class="sacts">
+        <button class="delbtn" onclick="delSched(event,${i},'${item._src}','${esc(item._uid || '')}')" title="Delete">×</button>
+        <div class="chk${done ? ' done' : ''}" onclick="togCheck(event,'${ck}')">${done ? '✓' : ''}</div>
+      </div>
+    </div>`;
+  });
+
+  if (!S.showAdd) {
+    html += `<button class="addbtn" onclick="showAdd()">+ ADD TASK</button>`;
+  } else {
+    html += `<div class="addform">
+      <div style="font-size:10px;letter-spacing:2px;color:#f0a830;margin-bottom:12px;font-weight:700">
+        NEW TASK · ${FULL_DAYS[S.selDay].toUpperCase()}
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input class="inp" id="nt_time" style="width:80px;flex:none" placeholder="21:30" value="${esc(S.newTask.time)}" oninput="S.newTask.time=this.value">
+        <input class="inp" id="nt_label" style="flex:1;width:auto" placeholder="Task label" value="${esc(S.newTask.label)}" oninput="S.newTask.label=this.value">
+      </div>
+      <select class="inp" style="margin-bottom:10px" onchange="S.newTask.type=this.value">
+        ${TYPES.map(t => `<option value="${t}"${S.newTask.type===t?' selected':''}>${t}</option>`).join('')}
+      </select>
+      <input class="inp" id="nt_detail" placeholder="Detail (optional)" style="margin-bottom:12px" value="${esc(S.newTask.detail)}" oninput="S.newTask.detail=this.value">
+      <div style="display:flex;gap:8px">
+        <button class="btnprimary" onclick="submitAdd()">ADD</button>
+        <button class="btncancel" onclick="cancelAdd()">CANCEL</button>
+      </div>
+    </div>`;
+  }
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ─── WORKOUT TAB ──────────────────────────────────────────────────────────────
+function renderWorkout(el, today, tk) {
+  const viewW = getWorkout(S.selDay);
+
+  let html = '<div class="pad">';
+  html += `<div style="margin-bottom:14px">
+    <div style="font-size:17px;font-weight:700;letter-spacing:2px;color:#e8e5db">${esc(viewW.name)}</div>
+    <div style="display:flex;gap:16px;margin-top:5px;font-size:11px;color:#9a9790">
+      <span>${esc(viewW.dur)}</span><span>${esc(viewW.focus)}</span>
+    </div>
+    <div class="notebox">${esc(viewW.note)}</div>
+  </div>`;
+
+  viewW.ex.forEach((ex, i) => {
+    const ck = tk + '_w_' + i;
+    const done = !!S.completed[ck];
+    const open = S.expandedEx === i;
+    const hasSets = ex.s && ex.s !== '—' && ex.s !== '-';
+    html += `<div class="exrow${open ? ' open' : ''}${done ? ' done' : ''}" onclick="toggleEx(${i})">
+      <div class="exhead">
+        <div style="flex:1">
+          <div class="exname${done ? ' done' : ''}">${esc(ex.n)}</div>
+          ${hasSets ? `<div class="exsets">${esc(ex.s)} sets · ${esc(ex.r)}</div>` : `<div class="exsets">${esc(ex.r)}</div>`}
+          ${ex.d ? `<div class="exdetail">${esc(ex.d)}</div>` : ''}
+        </div>
+        <div class="chk${done ? ' done' : ''}" onclick="togCheck(event,'${ck}')">${done ? '✓' : ''}</div>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ─── PROJECTS TAB ─────────────────────────────────────────────────────────────
+function renderProjects(el, curWeek, daysLeft) {
+  let html = '<div class="pad">';
+
+  // header progress card
+  html += `<div class="projhdr">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:10px;letter-spacing:2px;color:#f0a830;font-weight:700">SUMMER PROGRESS</div>
+        <div style="font-size:22px;font-weight:700;color:#e8e5db;margin-top:3px">WEEK ${curWeek} <span style="font-size:13px;color:#9a9790;font-weight:400">of 8</span></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:26px;font-weight:700;color:#BA7517">${daysLeft}</div>
+        <div style="font-size:9px;color:#5a5852;letter-spacing:1px">DAYS TO SEM</div>
+      </div>
+    </div>
+    <div class="weekbar"><div class="weekfill" style="width:${(curWeek/8*100).toFixed(1)}%"></div></div>
+  </div>`;
+
+  // due this week
+  html += `<div class="lbl">DUE THIS WEEK (WK ${curWeek})</div>`;
+  const dueNow = PROJECTS.flatMap(p => p.milestones.map((m, i) => ({...m, proj:p, idx:i}))).filter(m => m.week === curWeek);
+  if (dueNow.length === 0) {
+    html += `<div style="background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;padding:14px;margin-bottom:12px;font-size:12px;color:#5a5852;text-align:center">No milestones due this week — check if you're ahead or behind.</div>`;
+  } else {
+    dueNow.forEach(m => {
+      const key = 'proj_' + m.proj.id + '_' + m.idx;
+      const done = !!S.projDone[key];
+      html += `<div class="msrow" onclick="togProj('${key}')" style="background:${done?'#182210':'#1e1d1a'};border-left:3px solid ${esc(m.proj.color)};border-color:${done?'#5c8f20':'#3d2208'};opacity:${done?0.6:1}">
+        <div style="flex:1">
+          <div style="font-size:9px;letter-spacing:1px;color:${esc(m.proj.color)};margin-bottom:2px">${esc(m.proj.name)}</div>
+          <div style="font-size:13px;color:${done?'#5a5852':'#e8e5db'};text-decoration:${done?'line-through':'none'}">${esc(m.label)}</div>
+        </div>
+        <div class="chk${done?' done':''}" style="flex-shrink:0">${done?'✓':''}</div>
+      </div>`;
+    });
+  }
+
+  // all milestones
+  html += `<div class="lbl" style="padding-top:12px">ALL MILESTONES</div>`;
+  PROJECTS.forEach(p => {
+    html += `<div style="background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${esc(p.color)};flex-shrink:0"></div>
+        <div style="font-size:13px;font-weight:700;color:#e8e5db">${esc(p.name)}</div>
+        <div style="font-size:10px;color:#5a5852;flex:1">${esc(p.desc)}</div>
+      </div>`;
+    p.milestones.forEach((m, i) => {
+      const key = 'proj_' + p.id + '_' + i;
+      const done = !!S.projDone[key];
+      const isPast = m.week < curWeek;
+      const isCur = m.week === curWeek;
+      const bg = isCur ? '#221606' : (done ? '#182210' : '#252320');
+      const bc = done ? '#5c8f20' : (isCur ? '#3d2208' : '#2d2b27');
+      const wkColor = isCur ? '#f0a830' : (isPast && !done ? '#c04848' : '#5a5852');
+      html += `<div class="msrow" onclick="togProj('${key}')" style="background:${bg};border-color:${bc};opacity:${done?0.55:1}">
+        <div style="font-size:9px;color:${wkColor};min-width:30px;font-weight:${isCur?700:400}">Wk${m.week}</div>
+        <div style="flex:1;font-size:12px;color:${done?'#5a5852':'#e8e5db'};text-decoration:${done?'line-through':'none'}">${esc(m.label)}</div>
+        <div class="chk${done?' done':''}" style="width:20px;height:20px;font-size:10px;flex-shrink:0">${done?'✓':''}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  // weekly workout plan
+  html += `<div class="lbl" style="padding-top:12px">WEEKLY WORKOUT PLAN</div>`;
+  const today2 = new Date().getDay();
+  DAYS.forEach((d, i) => {
+    const w = getWorkout(i);
+    html += `<div class="wplanrow${i===today2?' today':''}" onclick="gotoWorkout(${i})">
+      <div style="font-size:14px;font-weight:700;min-width:34px;color:${i===today2?'#f0a830':'#9a9790'}">${d}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:#e8e5db">${esc(w.name)}</div>
+        <div style="font-size:10px;color:#5a5852;margin-top:2px">${esc(w.dur)} · ${esc(w.focus)}</div>
+      </div>
+      ${i===today2?'<span style="font-size:10px;color:#f0a830;flex-shrink:0">TODAY</span>':''}
+    </div>`;
+  });
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ─── COACH TAB ────────────────────────────────────────────────────────────────
+function renderCoach(el) {
+  let chatHtml = '';
+  S.chat.forEach(m => {
+    const isUser = m.role === 'user';
+    chatHtml += `<div style="display:flex;justify-content:${isUser?'flex-end':'flex-start'}">
+      <div class="bubble ${isUser?'user':'ai'}">
+        ${!isUser ? '<div class="ailabel">APEX COACH</div>' : ''}
+        ${m.content.split('\n').map(ln => `<div>${esc(ln) || '&nbsp;'}</div>`).join('')}
+      </div>
+    </div>`;
+  });
+  if (S.loading) {
+    chatHtml += `<div style="display:flex"><div class="bubble ai"><div class="ailabel">APEX COACH</div><div style="letter-spacing:2px;color:#BA7517">thinking...</div></div></div>`;
+  }
+
+  el.innerHTML = `<div style="display:flex;flex-direction:column;height:100%">
+    <div id="chatscroll">${chatHtml}</div>
+    <div id="chatform">
+      <input id="chatinput" placeholder="slept in, add task, should I restart MIA v1..." value="${esc(S.chatInput)}" oninput="S.chatInput=this.value" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+      <button class="sendbtn" onclick="sendChat()" ${S.loading||!S.chatInput.trim()?'disabled':''}>SEND</button>
+    </div>
+  </div>`;
+
+  // scroll to bottom
+  requestAnimationFrame(() => {
+    const cs = document.getElementById('chatscroll');
+    if (cs) cs.scrollTop = cs.scrollHeight;
+  });
+}
+
+// ─── INFO TAB ─────────────────────────────────────────────────────────────────
+function renderInfo(el, today, tk) {
+  const sections = [
+    { title:'YOUR STATS', rows:[
+      "Weight: 53kg → target 60kg &nbsp;|&nbsp; Height: 5'10\" &nbsp;|&nbsp; Age: 18",
+      "Goal: GAIN mass + fix posture (APT, rounded shoulders, left shoulder clicking)",
+      "Supplements: Creatine 5g/day · Whey post-workout · Magnesium biglycinate",
+      "Eat 2000+ cal/day minimum. High protein every meal. Non-negotiable.",
+    ]},
+    { title:'DAILY NON-NEGOTIABLES', rows:[
+      'APT wall fix — every single morning without exception',
+      'Left shoulder: cross-arm stretch + dead hangs — every single day',
+      'Wrist circuit — minimum 3× per week',
+      'Kandel journal: 1 specific moment each evening',
+      'Phone off during deep work blocks (Pomodoro 25+5)',
+    ]},
+    { title:'SUMMER PRIORITY ORDER', rows:[
+      '1. MIA V2 — inference script + Streamlit live — Weeks 1–3',
+      '2. GitHub Student Pack + profile polish — Week 1–2',
+      '3. Trading bot data pipeline — Weeks 3–5',
+      '4. Google AI Essentials + GitHub Essentials certs — Wks 4–6',
+      '5. MLH + CodePath + Keploy fellowship apps — Wks 5–6',
+      '⛔ DO NOT restart MIA V1 &nbsp;·&nbsp; DO NOT start new projects',
+    ]},
+    { title:'SUMMER CALENDAR', rows:[
+      'May 29 — Summer holidays start (Week 1)',
+      'Jul 21 — Semester 2 starts (Week 8 ends)',
+      'Aug–Sep — Microsoft Explore, Google STEP, Meta University open',
+      'Need before then: clean GitHub + working demo + polished profile',
+    ]},
+    { title:'CAREER TOOLS — ACTIVATE WEEK 1', rows:[
+      'GitHub Student Pack: education.github.com/pack',
+      'Cursor Pro — free for students, use for ALL project coding',
+      'GitHub Copilot — activate via Student Pack',
+      'Notion Pro — free for students',
+      'handshake.com + jobright.ai — build profiles this week',
+    ]},
+    { title:'HYGIENE PROTOCOL', rows:[
+      'Shower 2× daily: 7:45am + 8pm',
+      'Toner → Moisturizer → Sunscreen AM &nbsp;|&nbsp; Retinol PM',
+      'Brush + Floss + Tongue scrape 2× daily',
+      'Fragrance with Vaseline base. Shave/trim daily.',
+    ]},
+    { title:'AI COACH — HOW TO EDIT SCHEDULE', rows:[
+      '"add a 9pm breathing exercise to weekdays"',
+      '"remove the internship research block"',
+      '"add Saturday afternoon nap at 2pm"',
+      'Coach will update your schedule automatically.',
+      'Uses OpenRouter API — set your key in the Coach tab.',
+    ]},
+    { title:'MEMORY MANAGEMENT', rows:[
+      'Checkmarks auto-save to this device (localStorage)',
+      'Weekly reset: clears all checkmarks for the new week',
+      'Project milestones persist until manually cleared',
+      'Schedule edits persist until manually removed',
+    ]},
+  ];
+
+  let html = '<div class="pad">';
+  sections.forEach(s => {
+    html += `<div class="infocard">
+      <div class="infotitle">${s.title}</div>
+      ${s.rows.map(r => `<div class="inforow">${r}</div>`).join('')}
+    </div>`;
+  });
+
+  // memory controls
+  html += `<div class="infocard">
+    <div class="infotitle">RESET CONTROLS</div>
+    <button class="resetbtn" onclick="resetToday()">RESET TODAY'S CHECKMARKS</button>
+    <button class="resetbtn" onclick="resetWeek()">RESET THIS WEEK (NEW WEEK START)</button>
+    <button class="resetbtn" style="color:#c04848;border-color:#3d1515" onclick="resetAll()">RESET EVERYTHING (FULL WIPE)</button>
+  </div>`;
+
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+function setTab(t) {
+  S.tab = t;
+  S.expandedSched = null;
+  S.expandedEx = null;
+  render();
+}
+
+function setDay(d) {
+  S.selDay = d;
+  S.expandedSched = null;
+  S.expandedEx = null;
+  S.showAdd = false;
+  render();
+}
+
+function gotoWorkout(d) {
+  S.selDay = d;
+  S.tab = 'workout';
+  S.expandedEx = null;
+  render();
+}
+
+function toggleSched(i) {
+  S.expandedSched = S.expandedSched === i ? null : i;
+  render();
+}
+
+function toggleEx(i) {
+  S.expandedEx = S.expandedEx === i ? null : i;
+  render();
+}
+
+function togCheck(e, key) {
+  e.stopPropagation();
+  const c = { ...S.completed };
+  if (c[key]) delete c[key]; else c[key] = true;
+  S.completed = c;
+  ss('apex_completed', c);
+  render();
+}
+
+function togProj(key) {
+  const c = { ...S.projDone };
+  if (c[key]) delete c[key]; else c[key] = true;
+  S.projDone = c;
+  ss('apex_proj', c);
+  render();
+}
+
+function delSched(e, i, src, uid) {
+  e.stopPropagation();
+  const k = dKey(S.selDay);
+  const sched = JSON.parse(JSON.stringify(S.sched));
+  if (src === 'def') {
+    if (!sched.deleted[k].includes(i)) sched.deleted[k].push(i);
+  } else {
+    sched.added[k] = sched.added[k].filter(t => (t._uid || '') !== uid);
+  }
+  S.sched = sched;
+  ss('apex_sched', sched);
+  S.expandedSched = null;
+  render();
+}
+
+function showAdd() { S.showAdd = true; render(); }
+function cancelAdd() {
+  S.showAdd = false;
+  S.newTask = { time:'', label:'', type:'routine', detail:'' };
+  render();
+}
+function submitAdd() {
+  if (!S.newTask.time || !S.newTask.label) return;
+  const k = dKey(S.selDay);
+  const sched = JSON.parse(JSON.stringify(S.sched));
+  sched.added[k].push({
+    ...S.newTask,
+    _uid: 'add_' + Date.now() + '_' + Math.random().toString(36).slice(2)
+  });
+  S.sched = sched;
+  ss('apex_sched', sched);
+  S.showAdd = false;
+  S.newTask = { time:'', label:'', type:'routine', detail:'' };
+  render();
+}
+
+function resetToday() {
+  if (!confirm("Reset today's checkmarks?")) return;
+  const tk = todayKey();
+  const c = {};
+  Object.keys(S.completed).forEach(k => { if (!k.startsWith(tk)) c[k] = S.completed[k]; });
+  S.completed = c;
+  ss('apex_completed', c);
+  render();
+}
+
+function resetWeek() {
+  if (!confirm("Clear ALL checkmarks for the current week? Use this at the start of a new week.")) return;
+  S.completed = {};
+  ss('apex_completed', {});
+  render();
+}
+
+function resetAll() {
+  if (!confirm("FULL WIPE: This clears all checkmarks, chat history, and custom schedule edits. Cannot be undone.")) return;
+  S.completed = {};
+  S.projDone = {};
+  S.sched = { added:{weekday:[],saturday:[],sunday:[]}, deleted:{weekday:[],saturday:[],sunday:[]} };
+  S.chat = [{role:'assistant', content:'APEX Summer Mode active. 8 weeks, no commute, no excuses.\n\nStack is set: MIA V2 first → trading bot → certs → applications.\n\nAsk me about disruptions, schedule changes, or project decisions.'}];
+  ['apex_completed','apex_proj','apex_sched','apex_chat'].forEach(k => localStorage.removeItem(k));
+  render();
+}
+
+// ─── API KEY ──────────────────────────────────────────────────────────────────
+function saveApiKey() {
+  const key = document.getElementById('apikeyinput').value.trim();
+  if (!key) { alert('Enter a valid key'); return; }
+  S.apiKey = key;
+  ss('apex_apikey', key);
+  document.getElementById('apiscreen').style.display = 'none';
+}
+function closeApiScreen() {
+  document.getElementById('apiscreen').style.display = 'none';
+}
+
+// ─── COACH AI ─────────────────────────────────────────────────────────────────
+const SYS = `You are APEX, an elite personal coach AI for Ishan — 18yo CSE student at MIT Bengaluru (Year 1, CGPA 7.4).
+
+CURRENT CONTEXT: Summer holidays May 29 → Jul 21. No college, no commute, no athletics practice, no NCC. 7.5 weeks. Build foundation before Year 2.
+
+PROFILE: 53kg, 5'10", 18yo. UNDERWEIGHT — must GAIN mass (target 60kg by semester). Goals: hypertrophy + posture correction (APT, rounded shoulders, left shoulder clicking). Equipment: 3/5/7.5/10kg DBs, 12kg barbell, resistance bands, no gym. Supplements: Creatine 5g/day, Whey post-workout, Magnesium biglycinate.
+
+INJURIES: Left shoulder clicking — cross-arm stretch + dead hangs mandatory daily. APT — APT wall fix every morning without exception.
+
+SUMMER PRIORITY STACK (enforce this order):
+1. MIA V2 — inference script → Streamlit interface (Weeks 1–3)
+2. GitHub Student Pack + profile polish (Week 1–2, activate Cursor Pro + Copilot)
+3. Trading bot — data pipeline + SQLite (Weeks 3–5)
+4. Certifications — Google AI Essentials, GitHub Essentials, IBM CyberSec (Weeks 4–6)
+5. Fellowship applications — MLH, CodePath, Keploy (Weeks 5–6)
+
+CRITICAL — do not let him deviate:
+- Do NOT restart MIA V1. It is a documented learning exercise. V2 is structurally correct — finish it.
+- Do NOT start any new project before MIA V2 is done.
+- Microsoft Explore, Google STEP, Meta University open Aug–Sep. He needs clean GitHub + working demo before then.
+
+CAREER CONTEXT: Stretch targets: Razorpay/CRED/Atlassian. Realistic: CloudSEK/Zerodha/Groww. Single highest-leverage action = one internship/fellowship before graduation.
+
+TASK EDITING RULES (CRITICAL): When user asks to add/remove schedule tasks, include at END of reply:
+---COMMANDS---
+[{"action":"add","schedule":"weekday","task":{"time":"21:30","label":"Hip flexor stretch","type":"recovery","detail":"5 min"}}]
+---END---
+
+For deletion:
+---COMMANDS---
+[{"action":"delete","schedule":"weekday","label":"Exact task label here"}]
+---END---
+
+schedule = "weekday" / "saturday" / "sunday" only. Only include the block when explicitly asked to edit the schedule.
+Disruption protocol: 1) One-line acknowledgment. 2) Specific adjusted plan. 3) Direct line tied to summer goals.
+Be a coach: direct, specific, brief.`;
+
+async function sendChat() {
+  const msg = S.chatInput.trim();
+  if (!msg || S.loading) return;
+
+  // show API key screen if no key
+  if (!S.apiKey) {
+    document.getElementById('apiscreen').style.display = 'flex';
+    document.getElementById('apikeyinput').value = '';
+    return;
+  }
+
+  S.chatInput = '';
+  const nc = [...S.chat, { role:'user', content:msg }];
+  S.chat = nc;
+  S.loading = true;
+  render();
+
+  try {
+    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + S.apiKey,
+        'HTTP-Referer': location.href,
+        'X-Title': 'APEX LIFE',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-flash-1.5',
+        messages: [
+          { role:'system', content: SYS },
+          ...nc.slice(-14).map(m => ({ role: m.role, content: m.content }))
+        ],
+        max_tokens: 1000,
+      })
+    });
+
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'API error ' + r.status);
+    }
+
+    const data = await r.json();
+    const raw = data.choices?.[0]?.message?.content || 'No response. Try again.';
+    const { clean, cmds } = parseCmds(raw);
+
+    // apply schedule commands
+    const sched = JSON.parse(JSON.stringify(S.sched));
+    for (const cmd of cmds) {
+      const k = cmd.schedule;
+      if (!['weekday','saturday','sunday'].includes(k)) continue;
+      if (cmd.action === 'add' && cmd.task) {
+        sched.added[k].push({
+          ...cmd.task,
+          _uid: 'add_' + Date.now() + '_' + Math.random().toString(36).slice(2)
+        });
+      } else if (cmd.action === 'delete' && cmd.label) {
+        const dayNum = k === 'sunday' ? 0 : k === 'saturday' ? 6 : 1;
+        const base = getSched(dayNum);
+        const idx = base.findIndex(t => t.label === cmd.label);
+        if (idx !== -1) {
+          if (!sched.deleted[k].includes(idx)) sched.deleted[k].push(idx);
+        } else {
+          sched.added[k] = sched.added[k].filter(t => t.label !== cmd.label);
+        }
+      }
+    }
+    S.sched = sched;
+    ss('apex_sched', sched);
+
+    const notice = cmds.length ? '\n\n✓ ' + cmds.length + ' schedule change' + (cmds.length > 1 ? 's' : '') + ' applied.' : '';
+    const newChat = [...nc, { role:'assistant', content: clean + notice }];
+    S.chat = newChat;
+    ss('apex_chat', newChat);
+
+  } catch(err) {
+    S.chat = [...nc, { role:'assistant', content: 'Error: ' + err.message + '\n\nCheck your OpenRouter API key in settings.' }];
+  }
+
+  S.loading = false;
+  render();
+}
+
+// ─── ESCAPE HTML ──────────────────────────────────────────────────────────────
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── SERVICE WORKER ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
