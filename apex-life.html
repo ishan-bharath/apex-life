@@ -110,6 +110,7 @@ body{
 .sendbtn:disabled{opacity:.4;cursor:not-allowed}
 #chatinput{flex:1;background:#1e1d1a;border:1px solid #2d2b27;border-radius:10px;padding:11px 13px;color:#e8e5db;font-family:monospace;font-size:13px;outline:none}
 #chatinput:focus{border-color:#BA7517}
+.clearchatbtn{padding:11px 10px;background:#252320;border:1px solid #2d2b27;border-radius:10px;color:#9a9790;font-family:monospace;font-size:10px;cursor:pointer;flex-shrink:0}
 
 /* ── Misc ── */
 .lbl{font-size:10px;letter-spacing:2px;color:#5a5852;padding-bottom:10px}
@@ -150,7 +151,7 @@ body{
 <div id="header">
   <div>
     <div style="font-size:21px;font-weight:700;letter-spacing:4px;color:#e8e5db">APEX LIFE</div>
-    <div id="subtitle" style="font-size:10px;color:#5a5852;letter-spacing:2px;margin-top:2px">ISHAN </div>
+    <div id="subtitle" style="font-size:10px;color:#5a5852;letter-spacing:2px;margin-top:2px">ISHAN</div>
   </div>
   <div style="text-align:right">
     <div id="pctdisp" style="font-size:30px;font-weight:700;color:#BA7517">0%</div>
@@ -177,159 +178,172 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const FULL_DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const TYPES = ['routine','mental','hygiene','workout','nutrition','academic','project','sleep','recovery'];
 
+// DAILY ROUTINE (Section 1)
 const SCHEDULE_WEEKDAY = [
-  {time:'7:00', label:'Wake up — no snooze', type:'routine'},
-  {time:'7:03', label:'Visualization 3 min', type:'mental', detail:'Picture the best version of you. The feeling behind the goals — not the goals themselves. Eyes closed. Before touching your phone.'},
-  {time:'7:08', label:'Face debloat ritual', type:'hygiene', detail:'Oil → knuckle ears → scalp massage → scrape sides of neck → knuckle jawline → knuckle neck → fingers around eyes. Push tongue up 1 min (double chin fix). Push cheeks from sides.'},
-  {time:'7:20', label:'Workout (see Workout tab)', type:'workout'},
-  {time:'8:45', label:'Shower 1', type:'hygiene', detail:'Cold finish. Full wash.'},
-  {time:'8:55', label:'Skincare + oral hygiene', type:'hygiene', detail:'Toner → Moisturizer → Sunscreen. Brush → Floss → Tongue scrape. Fragrance with Vaseline base. Shave/trim.'},
-  {time:'9:15', label:'Creatine 5g + high-protein breakfast', type:'nutrition', detail:"Creatine with water first. Big breakfast. Whey if insufficient. 53kg at 5'10\" = eat more than feels natural, every single day."},
-  {time:'9:30', label:'Deep Work Block 1 — Projects', type:'project', detail:'2.5 hrs. Priority: MIA V2 inference script → Streamlit → Trading bot pipeline. No phone. Pomodoro 25/5. Ship something concrete every session.'},
-  {time:'12:00', label:'Lunch + hydrate', type:'nutrition', detail:'High protein lunch. 500ml water immediately.'},
-  {time:'13:00', label:'Certs / MIT OCW / Reading', type:'academic', detail:'Google AI Essentials → GitHub Essentials → IBM CyberSec → Claude Architect. Or MIT OpenCourseWare. 1.5 hrs.'},
-  {time:'14:30', label:'Break — walk outside', type:'recovery', detail:'15–20 min. Sunlight. Ideally phone-free.'},
-  {time:'15:00', label:'Deep Work Block 2 — optional', type:'project', detail:'Fellowship research, GitHub polish, internship applications. Skip entirely if brain is dead.'},
-  {time:'16:30', label:'APT fix + foam roll', type:'recovery', detail:'APT wall fix if missed morning. Foam roll tight areas. 15 min.'},
-  {time:'18:00', label:'Evening walk / light mobility', type:'recovery', detail:'30 min walk. Low-intensity cardio + mental reset combined.'},
-  {time:'20:00', label:'Shower 2', type:'hygiene', detail:'Warm. Oral hygiene. Retinol at night. Shave if needed.'},
-  {time:'20:30', label:'Reading — books', type:'mental', detail:'Psycho-Cybernetics, Naval Almanac, War of Art, Meditations (Aurelius), Dostoevsky. 30–40 min minimum.'},
-  {time:'21:15', label:'Internship / fellowship research', type:'academic', detail:'handshake.com, jobright.ai, underclassmen internship list. Check deadlines. Polish GitHub profile.'},
-  {time:'22:00', label:'Kandel journal 5 min', type:'mental', detail:'Write ONE moment today where you acted like the person you want to become. Specific behavior = specific synapse.'},
-  {time:'22:30', label:'Sleep — 8hr target', type:'sleep'},
+  {time:'5:00', label:'Wake up — no snooze', type:'routine', detail:'Get out of bed immediately. No snoozing.'},
+  {time:'5:03', label:'Visualization 3 min', type:'mental', detail:'Picture your best life. Focus on the feeling behind your goals with eyes closed.'},
+  {time:'5:06', label:'Face debloat ritual', type:'hygiene', detail:'Oil, knuckle ears, scalp massage, scrape sides of neck, knuckle jawline and neck, fingers around eyes, tongue up 1 min, push cheeks from side.'},
+  {time:'5:15', label:'Workout (see Workout tab)', type:'workout', detail:'Follow the workout for the day from the Workout section.'},
+  {time:'6:00', label:'Shower 1', type:'hygiene', detail:'Full wash with a cold finish.'},
+  {time:'6:05', label:'Skincare + oral hygiene', type:'hygiene', detail:'Toner, moisturizer, sunscreen; brush, floss, tongue scrape; fragrance with Vaseline base.'},
+  {time:'6:20', label:'Creatine 5g + breakfast', type:'nutrition', detail:'Creatine with water, high-protein breakfast, whey shake if food is not enough.'},
+  {time:'6:40', label:'Pack bag + leave prep', type:'routine', detail:'Pack college bag and get ready to leave.'},
+  {time:'7:00', label:'Leave home', type:'routine', detail:'Commute to college.'},
+  {time:'8:30', label:'College — use free periods', type:'academic', detail:'Attend classes. Use free periods for 2 focused Pomodoros. No scrolling.'},
+  {time:'19:00', label:'Leave college', type:'routine', detail:'Commute back home.'},
+  {time:'20:30', label:'Reach home', type:'routine', detail:'Arrive home from college.'},
+  {time:'20:30', label:'Shower 2', type:'hygiene', detail:'Warm shower, oral hygiene, shave/trim if needed, apply retinol at night.'},
+  {time:'21:00', label:'Study if not tired', type:'academic', detail:'Up to 90 minutes. Stop if too tired — sleep is higher priority.'},
+  {time:'22:15', label:'Kandel journal 5 min', type:'mental', detail:'Write one specific moment where you acted like the person you want to become.'},
+  {time:'22:30', label:'Sleep — 7 hr target', type:'sleep', detail:'Go to bed aiming for 7 hours of sleep.'},
 ];
 
 const SCHEDULE_SATURDAY = [
-  {time:'8:00', label:'Wake up', type:'routine'},
-  {time:'8:10', label:'Face debloat ritual', type:'hygiene', detail:'Full ritual. No rush.'},
-  {time:'8:25', label:'Full workout session', type:'workout'},
-  {time:'10:20', label:'Shower + full skincare', type:'hygiene'},
-  {time:'10:50', label:'Breakfast + supplements', type:'nutrition', detail:'Big breakfast. Whey. Creatine. Eat well.'},
-  {time:'11:00', label:'Main project session — no interruptions', type:'project', detail:'3 focused hours. Biggest task on the board. Most important technical work of the week.'},
-  {time:'14:00', label:'Lunch + rest', type:'nutrition'},
-  {time:'15:00', label:'Weekly review + plan', type:'mental', detail:'What shipped? What blocked? Update milestones. Check fellowship deadlines. Set 3 non-negotiables for next week.'},
-  {time:'16:00', label:'Walk or outdoor time', type:'recovery'},
-  {time:'20:00', label:'Shower 2', type:'hygiene'},
-  {time:'21:00', label:'Kandel journal + plan next week', type:'mental'},
-  {time:'22:30', label:'Sleep', type:'sleep'},
+  {time:'6:00', label:'Wake up', type:'routine', detail:'Get out of bed and start the day.'},
+  {time:'6:15', label:'Face debloat ritual', type:'hygiene', detail:'Full debloat ritual without rushing.'},
+  {time:'6:30', label:'Long workout', type:'workout', detail:'Follow the Saturday full session workout.'},
+  {time:'8:30', label:'Shower 1 + full skincare', type:'hygiene', detail:'Full wash and complete skincare routine.'},
+  {time:'9:00', label:'Breakfast + supplements', type:'nutrition', detail:'Eat breakfast and take supplements.'},
+  {time:'10:00', label:'Study / Projects / Career', type:'project', detail:'Projects, certifications, coding, internship prep, or GitHub.'},
+  {time:'14:00', label:'Rest + foam roll + hydrate', type:'recovery', detail:'Rest, foam roll muscles, drink water.'},
+  {time:'21:00', label:'Shower 2', type:'hygiene', detail:'Second shower of the day.'},
+  {time:'22:00', label:'Kandel journal + plan next week', type:'mental', detail:'Journal and plan the upcoming week.'},
+  {time:'22:30', label:'Sleep', type:'sleep', detail:'Go to sleep.'},
 ];
 
 const SCHEDULE_SUNDAY = [
-  {time:'8:30', label:'Wake up — rest day', type:'routine'},
-  {time:'9:00', label:'Recovery session', type:'workout'},
-  {time:'10:00', label:'Shower + full skincare', type:'hygiene'},
-  {time:'10:30', label:'Breakfast + supplements', type:'nutrition'},
-  {time:'11:00', label:'Reading / philosophy', type:'mental', detail:'Psycho-Cybernetics, Naval, War of Art. Marcus Aurelius. Dostoevsky. One chapter minimum.'},
-  {time:'14:00', label:'Rest — no screens if possible', type:'recovery', detail:'Mandatory. Brain consolidates during actual rest. Go outside.'},
-  {time:'16:00', label:'Week prep', type:'routine', detail:'Groceries, meal prep, workspace setup. Set 3 non-negotiable tasks for next week. Check fellowship deadlines.'},
-  {time:'20:00', label:'Shower 2 + prep for week', type:'hygiene'},
-  {time:'21:00', label:'Kandel journal', type:'mental'},
-  {time:'22:30', label:'Sleep', type:'sleep'},
+  {time:'6:30', label:'Wake up', type:'routine', detail:'Get out of bed.'},
+  {time:'6:45', label:'Recovery session', type:'workout', detail:'Do the Sunday recovery workout.'},
+  {time:'8:00', label:'Shower + full skincare', type:'hygiene', detail:'Shower and complete skincare routine.'},
+  {time:'8:30', label:'Breakfast + supplements', type:'nutrition', detail:'Eat breakfast and take supplements.'},
+  {time:'10:00', label:'Reading / MIT OCW / Rest', type:'academic', detail:'Read books or do course modules, or rest.'},
+  {time:'15:00', label:'Weekly review + plan', type:'mental', detail:'Review the week, update athletics schedule and APEX coach if needed.'},
+  {time:'21:00', label:'Shower 2 + prep for week', type:'hygiene', detail:'Second shower and prepare for the next week.'},
+  {time:'22:00', label:'Kandel journal', type:'mental', detail:'Do Kandel journal entry.'},
+  {time:'22:30', label:'Sleep', type:'sleep', detail:'Go to sleep.'},
 ];
 
-const WORKOUT_UPPER = {
-  name:'UPPER — MASS', dur:'70 min', focus:'Hypertrophy + arm size',
-  note:'Goal: GAIN mass. 53kg is underweight. 3-sec negatives every rep. Whey within 30 min. 2000+ cal/day minimum.',
+// WORKOUTS (Section 2)
+const WORKOUT_POSTURE_CORE = {
+  name:'POSTURE + CORE', dur:'45 min', focus:'Mobility and core focus',
+  note:'Athletics morning weekday. Posture + core; keeps legs fresh.',
   ex:[
-    {n:'Wrist circuit', s:'1', r:'Full', d:'Palms forward → facing you → reverse → finger pulses half + full. Forearm health before everything.'},
-    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'3 points touching wall. Bend knee till lower back touches naturally. Non-negotiable every session.'},
-    {n:'DB chest press', s:'4', r:'10–12', d:'7.5kg. Full range. 3-sec negative. Slight arch. Main chest mass builder.'},
-    {n:'Incline pushups', s:'3', r:'15', d:'Upper chest. Slow negative. Full range.'},
-    {n:'DB pullovers', s:'3', r:'12', d:'10kg. Reach back full extension. Rib cage expansion + lat width.'},
-    {n:'Hindu pushups', s:'3', r:'10–12', d:'Shoulder mass + mobility. Dive through, hold at bottom.'},
-    {n:'Single arm press', s:'3', r:'10 each', d:'5kg. Functional shoulder strength. Core braced throughout.'},
-    {n:'Gorilla rows', s:'4', r:'12 each', d:'7.5–10kg. Back mass. Explosive pull, squeeze at top.'},
-    {n:'Meadows rows', s:'3', r:'10 each', d:'Elbow high. Lat isolation. Band or DB.'},
-    {n:'Bicep curls', s:'3', r:'12–15', d:'5–7.5kg. 3-sec negative. Supinate at top. Arm mass.'},
-    {n:'Skull crushers', s:'3', r:'12', d:'3–5kg. Tricep mass. Elbow stays fixed.'},
-    {n:'Floor pulses + wrist rotation', s:'2', r:'30+20', d:'Forearm size. Knuckle pulses on floor then 3kg wrist rotations each way.'},
-    {n:'Dead hang', s:'2', r:'45–60 sec', d:'Daily. Left shoulder + spinal decompression.'},
-    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Left shoulder. Daily non-negotiable.'},
+    {n:'Wrist mobility full circuit', s:'1', r:'2 rounds', d:'Palms forward, facing you, pointing reverse, finger pulses half and full.'},
+    {n:'APT wall fix', s:'3', r:'30–45 sec hold', d:'Back to wall with 3 points touching, bend knee till pelvis touches wall, elbows forward, breathe.'},
+    {n:'2-min mobility circuit', s:'2', r:'Full circuit', d:'Deep squat knees out, squat sits palms to floor, deep lunge chest to ground, downward dog 5 pulses, squat and open arms with rotation.'},
+    {n:'Hollow holds', s:'3', r:'Till failure', d:'Lower back pressed flat to floor for core strength.'},
+    {n:'Seesaw', s:'3', r:'12 reps', d:'Controlled rugby-core movement.'},
+    {n:'Dead hang', s:'2', r:'30–60 sec', d:'Spinal decompression and left shoulder health, daily.'},
+    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Daily left shoulder injury prevention.'},
   ]
 };
 
-const WORKOUT_LOWER = {
-  name:'LOWER — MASS + POSTURE', dur:'65 min', focus:'Leg mass + APT correction',
-  note:'APT fix takes 6–12 months of daily work. Leg mass responds fast. Both goals are served here.',
+const WORKOUT_STRENGTH_LOWER = {
+  name:'STRENGTH — LOWER', dur:'55 min', focus:'Running performance',
+  note:'Primary lower-body strength for running.',
   ex:[
-    {n:'90/90s + wrist circuit', s:'1', r:'30 reps + full', d:'Hip mobility 30 reps first. Wrist circuit. Both required.'},
-    {n:'APT wall fix — extended', s:'4', r:'60 sec hold', d:'Longer holds on lower days. Breathe in through nose into belly. This is your main posture fix.'},
-    {n:'Bulgarian split squats', s:'4', r:'10–12 each', d:'Bodyweight or 5kg. 3-sec negative. Main quad + glute mass builder.'},
-    {n:'Sissy squats', s:'3', r:'12–15', d:'Lean back. Knees forward. Quad isolation. Deeper every week.'},
-    {n:'RDL extensions', s:'3', r:'12', d:'7.5–10kg. Hinge hips. Hamstring fully loaded. Slow negative.'},
-    {n:'Zercher squats', s:'3', r:'8–10', d:'12kg barbell. Core braced. Full depth. Postural strength.'},
-    {n:'Copenhagen plank', s:'3', r:'20–30 sec each', d:'Inner thigh + core. Injury prevention.'},
-    {n:'Hollow holds', s:'3', r:'Till failure', d:'Lower back flat to floor. Long-term APT correction.'},
-    {n:'Pike pushup core', s:'3', r:'50 reps', d:'Feet on chair, arms on floor, pike position. Hips up/down bending knee. Posture + conditioning.'},
-    {n:'Seesaw', s:'3', r:'12', d:'Core rotation. Controlled throughout.'},
-    {n:'Dead hang', s:'2', r:'1 min', d:'Daily. Spinal decompression. Posture.'},
+    {n:'Wrist circuit + 90/90s warmup', s:'1', r:'Full + 30 reps', d:'Full wrist mobility then 90/90 hip mobility for 30 reps.'},
+    {n:'Bulgarian split squats', s:'4', r:'8–10 each leg', d:'Bodyweight or 5kg DBs, 3-sec negative, feel hip flexor stretch.'},
+    {n:'RDL extensions', s:'3', r:'12 reps', d:'7.5–10kg DBs, hinge at hips, slow negative, core braced.'},
+    {n:'Zercher squats', s:'3', r:'8 reps', d:'12kg barbell in elbow crease, strong core brace, deep full-depth squat.'},
+    {n:'Sissy squats', s:'3', r:'10–12 reps', d:'Bodyweight, lean back, knees far forward, quad isolation.'},
+    {n:'Copenhagen plank', s:'3', r:'20–30 sec each side', d:'Inner thigh and core for injury prevention in runners.'},
+    {n:'Single leg knee drive', s:'3', r:'15 each leg', d:'Explosive hip extension, very running specific.'},
+    {n:'Frog jumps', s:'3', r:'8–10 jumps', d:'Max effort, full hip extension, soft landings, 20–30 jumps per week total.'},
   ]
 };
 
-const WORKOUT_CORE_MOB = {
-  name:'CORE + MOBILITY', dur:'45 min', focus:'Active recovery + Posture repair',
-  note:"Mid-week recovery. Low intensity only. This session fixes your body — don't turn it into a strength session.",
+const WORKOUT_UPPER_MASS = {
+  name:'UPPER BODY + MASS', dur:'55 min', focus:'Hypertrophy',
+  note:'Upper-body weekday hypertrophy focus.',
   ex:[
-    {n:'Foam roller — full body', s:'1', r:'7 min', d:'Quads → hamstrings → calves → upper back → lats. 60 sec per area.'},
-    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'Every single day without exception.'},
-    {n:'Wrist mobility full circuit', s:'1', r:'Complete', d:'All 4 positions + finger pulses.'},
-    {n:'90/90s', s:'2', r:'30 reps', d:'Hip mobility. APT correction.'},
-    {n:'Cobra stretch + shoulder roll', s:'2', r:'30 reps', d:'Spine + left shoulder care.'},
-    {n:'Scorpion stretch', s:'2', r:'12 each', d:'Hip + spine rotation.'},
-    {n:'Wood choppers', s:'3', r:'12 each side', d:'Resistance band. Rotational core.'},
-    {n:'Pendulum swings', s:'3', r:'10 each', d:'Hip drive. Controlled movement.'},
-    {n:'Ab rollers', s:'3', r:'8–10', d:'Full extension if possible. Best core exercise.'},
-    {n:'Dead hangs', s:'3', r:'1 min', d:'Daily. Left shoulder.'},
-    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Left shoulder. Non-negotiable.'},
-    {n:'2-min mobility circuit', s:'2', r:'Full', d:'Squat knees out → squat sits → deep lunge chest to ground → downdog 5 pulses → squat rotate'},
+    {n:'Fingertip + wrist pushup warmup', s:'1', r:'10+10+15', d:'Fingertip pushups, wrist pushups, wrist rocks.'},
+    {n:'DB chest press', s:'4', r:'10–12', d:'7.5kg DBs, full range, slight arch, 3-sec negative.'},
+    {n:'DB pullovers', s:'3', r:'12', d:'10kg DB, full extension, stretch lats and chest.'},
+    {n:'Single arm press', s:'3', r:'10 each arm', d:'5kg DB, functional shoulder strength with core braced.'},
+    {n:'Gorilla rows', s:'4', r:'10–12 each', d:'7.5–10kg, explosive pull and squeeze at top for back thickness.'},
+    {n:'Meadows rows', s:'3', r:'10 each', d:'Band or DB, elbow high and lat-focused.'},
+    {n:'Bicep curls', s:'3', r:'12–15', d:'5–7.5kg, 3-sec negative, supinate at top.'},
+    {n:'Skull crushers', s:'3', r:'12', d:'3–5kg DBs, controlled descent, elbows fixed.'},
+    {n:'Wrist rotation with weight', s:'2', r:'20 each way', d:'3kg DB, wrist rolls through full range.'},
+    {n:'Floor pulses for forearms', s:'2', r:'30', d:'Knuckles on floor for forearm strength and definition.'},
   ]
 };
 
-const WORKOUT_SATURDAY = {
-  name:'SATURDAY — FULL SESSION', dur:'90–100 min', focus:'All qualities + posture',
-  note:'Full warmup mandatory. No time pressure. Main development session of the week. Eat well after.',
+const WORKOUT_SPEED_PLYO = {
+  name:'SPEED + PLYOMETRICS', dur:'50 min', focus:'Running performance',
+  note:'Speed day weekday, running speed and jumps.',
   ex:[
-    {n:'Full warmup sequence', s:'1', r:'Complete', d:'Dead hangs 2–3min → foam roller 7min → 90/90s 30 reps → knee pullovers 8 → cobra+shoulder roll 30 → scorpion 12 → squat ext 8 → squat sits 15 → shoulder 90s → cross-arm 30s → hip+quad bounces 20'},
-    {n:'APT wall fix', s:'4', r:'60 sec hold', d:'Saturday = maximum posture work. Longest holds of the week.'},
-    {n:'Strength block', s:'—', r:'Upper or lower — less done this week', d:'Full sets. Pick whichever you did fewer times this week.'},
-    {n:'V-ups', s:'3', r:'15–20', d:'Abs. Full range. No momentum.'},
-    {n:'Reverse crunches', s:'3', r:'15–20', d:'Lower abs. Tilt pelvis at top.'},
-    {n:'Seal-ups', s:'3', r:'12', d:'Back extension. Spine health.'},
-    {n:'Pull-ups / doorway curls', s:'3', r:'Till failure', d:'Back width. Doorway bicep curls if no bar.'},
-    {n:'Dips till failure', s:'3', r:'Failure', d:'Triceps + chest. Lock at top.'},
-    {n:'Long walk — 40–60 min', s:'1', r:'Easy pace', d:'Aerobic base + mental reset. Do this after the session, not before.'},
+    {n:'Full 2-min mobility warmup', s:'2', r:'Full circuit', d:'Squat knees out, squat sits, deep lunge, downward dog 5 pulses, squat with arm rotations.'},
+    {n:'Straight leg bounce', s:'3', r:'30 sec', d:'Fast ground contacts, minimal contact time.'},
+    {n:'High knees', s:'4', r:'20 m × 3', d:'Drive knees high with matching arm drive, stay tall.'},
+    {n:'Single leg knee drive', s:'3', r:'10 each', d:'Explosive hip extension for running-specific power.'},
+    {n:'Frog jumps', s:'3', r:'8', d:'Max effort, full hip extension, soft landings.'},
+    {n:'Active lunges', s:'3', r:'10 each leg', d:'Moving lunges; add 3kg DBs if easy.'},
+    {n:'Pull-ups', s:'3', r:'To failure', d:'Support running posture and late-race form.'},
+    {n:'Plank pulls', s:'3', r:'12 each', d:'Controlled core stability work.'},
+    {n:'Isometric holds', s:'3', r:'30–45 sec', d:'Wall sit or split squat hold for strength endurance.'},
   ]
 };
 
-const WORKOUT_SUNDAY = {
-  name:'SUNDAY — RECOVERY', dur:'40 min', focus:'Repair + Posture',
-  note:'Quality rest = quality work all next week. Non-optional.',
+const WORKOUT_MOBILITY_NCC = {
+  name:'MOBILITY ONLY — NCC DAY', dur:'30 min', focus:'Recovery and posture',
+  note:'Friday NCC day mobility and posture.',
   ex:[
-    {n:'Foam roller — full body', s:'1', r:'7 min', d:'Quads → hamstrings → calves → IT band → upper back → lats.'},
-    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'Every day. Non-negotiable.'},
-    {n:'Dead hangs', s:'3', r:'1–2 min', d:'Daily. Left shoulder + spine.'},
+    {n:'APT wall fix', s:'2', r:'30 sec hold', d:'Daily posture maintenance, never skipped.'},
+    {n:'Wrist mobility full circuit', s:'1', r:'Full', d:'All four wrist positions plus finger pulses.'},
+    {n:'Cobra stretch + shoulder roll', s:'2', r:'30 reps', d:'Spine mobility and left shoulder care.'},
+    {n:'Cross-arm stretch', s:'2', r:'30 sec each', d:'Left shoulder non-negotiable stretch.'},
+    {n:'90/90s', s:'1', r:'30 reps', d:'Hip mobility.'},
+    {n:'Dead hang', s:'2', r:'30–45 sec', d:'Shoulder decompression.'},
+    {n:'Scorpion stretch', s:'1', r:'12 reps', d:'Hip and spine rotation.'},
+  ]
+};
+
+const WORKOUT_SATURDAY_FULL = {
+  name:'SATURDAY — FULL SESSION', dur:'90–120 min', focus:'All qualities',
+  note:'Long mixed-quality workout + long run.',
+  ex:[
+    {n:'Pre-race full warmup', s:'1', r:'Complete sequence', d:'Dead hangs 2–3min, foam roller 7min, 90/90s 30 reps, knee pullovers 8, cobra+shoulder roll 30, scorpion 12, squat extensions 8, squat sits 15, shoulder 90s, cross-arm 30s, hip+quad bounces 20.'},
+    {n:'Strength block — pick lower or upper', s:'1', r:'1 block', d:'Choose lower or upper based on what you did less this week.'},
+    {n:'Core: wood choppers', s:'3', r:'12 each side', d:'Resistance band, rotational core power.'},
+    {n:'Core: pendulum swings', s:'3', r:'10 each', d:'Controlled hip drive.'},
+    {n:'Core: ab rollers', s:'3', r:'8–10', d:'Full extension for strong runner’s core.'},
+    {n:'Long run — easy pace', s:'1', r:'30–60 min', d:'Conversational pace run or cycling/swimming alternative.'},
+  ]
+};
+
+const WORKOUT_SUNDAY_RECOVERY = {
+  name:'SUNDAY — FULL RECOVERY', dur:'45 min', focus:'Recovery',
+  note:'Mobility and recovery focus.',
+  ex:[
+    {n:'Foam roller — full body', s:'1', r:'7 min', d:'Quads, hamstrings, calves, IT band, upper back, lats ~60 sec each.'},
+    {n:'Dead hangs', s:'3', r:'1–2 min', d:'Spinal decompression and daily left shoulder health.'},
     {n:'90/90s', s:'2', r:'30 reps', d:'Hip mobility.'},
-    {n:'Knee pullovers', s:'2', r:'8 reps', d:''},
-    {n:'Cobra + shoulder roll', s:'2', r:'30 reps', d:'Spine + left shoulder.'},
-    {n:'Scorpion stretch', s:'2', r:'12 each', d:'Full rotation.'},
-    {n:'Hip + quad bounces', s:'2', r:'20 reps', d:''},
-    {n:'Wrist circuit', s:'1', r:'Complete', d:'All 4 positions.'},
+    {n:'Knee pullovers', s:'2', r:'8 reps', d:'Recovery movement.'},
+    {n:'Cobra stretch + shoulder roll', s:'2', r:'30 reps', d:'Spine and shoulder mobility.'},
+    {n:'Scorpion stretch', s:'2', r:'12 reps', d:'Hip and spine rotation.'},
+    {n:'Hip + quad bounces', s:'2', r:'20 reps', d:'Hip and quad mobility.'},
+    {n:'Wrist mobility full circuit', s:'1', r:'Complete', d:'Full wrist routine.'},
+    {n:'APT wall fix', s:'3', r:'45 sec hold', d:'Daily posture repair over months of consistency.'},
   ]
 };
 
+// Weekday to workout mapping (athletics Mon & Fri evenings)
 function getWorkout(day) {
+  // 0=Sun ... 6=Sat
   switch(day) {
-    case 0: return WORKOUT_SUNDAY;
-    case 1: return WORKOUT_UPPER;
-    case 2: return WORKOUT_LOWER;
-    case 3: return WORKOUT_CORE_MOB;
-    case 4: return WORKOUT_UPPER;
-    case 5: return WORKOUT_LOWER;
-    case 6: return WORKOUT_SATURDAY;
-    default: return WORKOUT_CORE_MOB;
+    case 1: return WORKOUT_POSTURE_CORE;      // Monday
+    case 2: return WORKOUT_STRENGTH_LOWER;    // Tuesday
+    case 3: return WORKOUT_UPPER_MASS;        // Wednesday
+    case 4: return WORKOUT_SPEED_PLYO;        // Thursday
+    case 5: return WORKOUT_MOBILITY_NCC;      // Friday
+    case 6: return WORKOUT_SATURDAY_FULL;     // Saturday
+    case 0: default: return WORKOUT_SUNDAY_RECOVERY; // Sunday
   }
 }
 
+// PROJECTS and rest of code UNCHANGED
 const PROJECTS = [
   {id:'mia', name:'MIA V2', color:'#7265c8', desc:'AI companion · inference → Streamlit', milestones:[
     {label:'Commit V2 notebook + clean repo structure', week:1},
@@ -460,8 +474,8 @@ function render() {
   const pct = totalItems > 0 ? Math.round(doneItems / totalItems * 100) : 0;
 
   document.getElementById('pctdisp').textContent = pct + '%';
-  document.getElementById('daysdisp').textContent = daysLeft + 'd LEFT';
-  document.getElementById('subtitle').textContent = 'ISHAN · SUMMER 2026 · WK ' + curWeek + '/8';
+  document.getElementById('daysdisp').textContent = '';
+  document.getElementById('subtitle').textContent = 'ISHAN';
 
   // tab active state
   document.querySelectorAll('.tab').forEach(t => {
@@ -497,7 +511,6 @@ function renderToday(el, today, tk) {
 
   let html = '<div class="pad">';
   html += `<div class="lbl">${FULL_DAYS[S.selDay].toUpperCase()} &nbsp;·&nbsp; SCHEDULE</div>`;
-
   viewMerged.forEach((item, i) => {
     const ck = dateKeyForDay(S.selDay) + '_s_' + i;
     const done = !!S.completed[ck];
@@ -576,7 +589,7 @@ function renderWorkout(el, today, tk) {
   el.innerHTML = html;
 }
 
-// ─── PROJECTS TAB ─────────────────────────────────────────────────────────────
+// ─── PROJECTS TAB (unchanged) ────────────────────────────────────────────────
 function renderProjects(el, curWeek, daysLeft) {
   let html = '<div class="pad">';
 
@@ -679,6 +692,7 @@ function renderCoach(el) {
     <div id="chatscroll">${chatHtml}</div>
     <div id="chatform">
       <input id="chatinput" placeholder="slept in, add task, should I restart MIA v1..." value="${esc(S.chatInput)}" oninput="S.chatInput=this.value" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+      <button class="clearchatbtn" onclick="clearChatHistory()">CLEAR</button>
       <button class="sendbtn" onclick="sendChat()" ${S.loading||!S.chatInput.trim()?'disabled':''}>SEND</button>
     </div>
   </div>`;
@@ -690,7 +704,7 @@ function renderCoach(el) {
   });
 }
 
-// ─── INFO TAB ─────────────────────────────────────────────────────────────────
+// ─── INFO TAB (unchanged except text still references summer) ────────────────
 function renderInfo(el, today, tk) {
   const sections = [
     { title:'YOUR STATS', rows:[
@@ -712,7 +726,7 @@ function renderInfo(el, today, tk) {
       '3. Trading bot data pipeline — Weeks 3–5',
       '4. Google AI Essentials + GitHub Essentials certs — Wks 4–6',
       '5. MLH + CodePath + Keploy fellowship apps — Wks 5–6',
-      '⛔ DO NOT restart MIA V1 &nbsp;·&nbsp; DO NOT start new projects',
+      '⛔ DO NOT restart MIA V1 · DO NOT start new projects',
     ]},
     { title:'SUMMER CALENDAR', rows:[
       'May 29 — Summer holidays start (Week 1)',
@@ -729,7 +743,7 @@ function renderInfo(el, today, tk) {
     ]},
     { title:'HYGIENE PROTOCOL', rows:[
       'Shower 2× daily: 7:45am + 8pm',
-      'Toner → Moisturizer → Sunscreen AM &nbsp;|&nbsp; Retinol PM',
+      'Toner → Moisturizer → Sunscreen AM · Retinol PM',
       'Brush + Floss + Tongue scrape 2× daily',
       'Fragrance with Vaseline base. Shave/trim daily.',
     ]},
@@ -769,7 +783,7 @@ function renderInfo(el, today, tk) {
   el.innerHTML = html;
 }
 
-// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+// ─── ACTIONS (unchanged except clearChatHistory) ─────────────────────────────
 function setTab(t) {
   S.tab = t;
   S.expandedSched = null;
@@ -882,6 +896,14 @@ function resetAll() {
   render();
 }
 
+// clear chat button logic
+function clearChatHistory() {
+  if (!confirm("Clear ALL coach messages on this device?")) return;
+  S.chat = [{role:'assistant', content:'APEX Summer Mode active. 8 weeks, no commute, no excuses.\n\nStack is set: MIA V2 first → trading bot → certs → applications.\n\nAsk me about disruptions, schedule changes, or project decisions.'}];
+  ss('apex_chat', S.chat);
+  render();
+}
+
 // ─── API KEY ──────────────────────────────────────────────────────────────────
 function saveApiKey() {
   const key = document.getElementById('apikeyinput').value.trim();
@@ -894,7 +916,7 @@ function closeApiScreen() {
   document.getElementById('apiscreen').style.display = 'none';
 }
 
-// ─── COACH AI ─────────────────────────────────────────────────────────────────
+// ─── COACH AI (unchanged) ─────────────────────────────────────────────────────
 const SYS = `You are APEX, an elite personal coach AI for Ishan — 18yo CSE student at MIT Bengaluru (Year 1, CGPA 7.4).
 
 CURRENT CONTEXT: Summer holidays May 29 → Jul 21. No college, no commute, no athletics practice, no NCC. 7.5 weeks. Build foundation before Year 2.
@@ -958,7 +980,7 @@ async function sendChat() {
         'X-Title': 'APEX LIFE',
       },
       body: JSON.stringify({
-        model: 'google/gemini-flash-1.5',
+        model: 'openrouter/free',
         messages: [
           { role:'system', content: SYS },
           ...nc.slice(-14).map(m => ({ role: m.role, content: m.content }))
@@ -1028,7 +1050,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
-// ─── INIT ──────────────────────────────────────────────────────────────────────
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 render();
 </script>
 </body>
