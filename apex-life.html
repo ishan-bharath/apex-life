@@ -195,7 +195,7 @@ const SCHEDULE_WEEKDAY = [
   {time:'20:00', label:'Shower 2', type:'hygiene', detail:'Warm. Oral hygiene. Retinol at night. Shave if needed.'},
   {time:'20:30', label:'Reading — books', type:'mental', detail:'Psycho-Cybernetics, Naval Almanac, War of Art, Meditations (Aurelius), Dostoevsky. 30–40 min minimum.'},
   {time:'21:15', label:'Internship / fellowship research', type:'academic', detail:'handshake.com, jobright.ai, underclassmen internship list. Check deadlines. Polish GitHub profile.'},
-  {time:'22:00', label:'Kandel journal — 5 min', type:'mental', detail:'Write ONE moment today where you acted like the person you want to become. Specific behavior = specific synapse.'},
+  {time:'22:00', label:'Kandel journal 5 min', type:'mental', detail:'Write ONE moment today where you acted like the person you want to become. Specific behavior = specific synapse.'},
   {time:'22:30', label:'Sleep — 8hr target', type:'sleep'},
 ];
 
@@ -760,7 +760,8 @@ function renderInfo(el, today, tk) {
   html += `<div class="infocard">
     <div class="infotitle">RESET CONTROLS</div>
     <button class="resetbtn" onclick="resetToday()">RESET TODAY'S CHECKMARKS</button>
-    <button class="resetbtn" onclick="resetWeek()">RESET THIS WEEK (NEW WEEK START)</button>
+    <button class="resetbtn" onclick="resetWeek()">RESET THIS WEEK (use Sunday night)</button>
+    <div class="subnote">Clears all checkmarks from the current week only.</div>
     <button class="resetbtn" style="color:#c04848;border-color:#3d1515" onclick="resetAll()">RESET EVERYTHING (FULL WIPE)</button>
   </div>`;
 
