@@ -140,7 +140,7 @@ body{
       <button class="btncancel" onclick="closeApiScreen()">SKIP</button>
     </div>
     <div style="font-size:11px;color:#5a5852;margin-top:12px;line-height:1.6">
-      Model used: <span style="color:#BA7517">google/gemini-2.0-flash-exp:free</span> (free tier)<br>
+      Model used: <span style="color:#BA7517">google/gemini-flash-1.5</span> (free tier)<br>
       Schedule editing fully works offline without a key.
     </div>
   </div>
@@ -380,6 +380,14 @@ function todayKey() {
   const d = new Date();
   return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
 }
+function dateKeyForDay(day) {
+  const now = new Date();
+  const target = new Date(now);
+  target.setHours(0,0,0,0);
+  const diff = day - now.getDay();
+  target.setDate(now.getDate() + diff);
+  return target.getFullYear() + '-' + target.getMonth() + '-' + target.getDate();
+}
 function weekKey() {
   const d = new Date();
   const day = d.getDay();
@@ -491,7 +499,7 @@ function renderToday(el, today, tk) {
   html += `<div class="lbl">${FULL_DAYS[S.selDay].toUpperCase()} &nbsp;·&nbsp; SCHEDULE</div>`;
 
   viewMerged.forEach((item, i) => {
-    const ck = tk + '_s_' + i;
+    const ck = dateKeyForDay(S.selDay) + '_s_' + i;
     const done = !!S.completed[ck];
     const open = S.expandedSched === i;
     const hasDetail = item.detail && item.detail.trim();
@@ -548,7 +556,7 @@ function renderWorkout(el, today, tk) {
   </div>`;
 
   viewW.ex.forEach((ex, i) => {
-    const ck = tk + '_w_' + i;
+    const ck = dateKeyForDay(S.selDay) + '_w_' + i;
     const done = !!S.completed[ck];
     const open = S.expandedEx === i;
     const hasSets = ex.s && ex.s !== '—' && ex.s !== '-';
@@ -949,7 +957,7 @@ async function sendChat() {
         'X-Title': 'APEX LIFE',
       },
       body: JSON.stringify({
-        model: 'openrouter/free',
+        model: 'google/gemini-flash-1.5',
         messages: [
           { role:'system', content: SYS },
           ...nc.slice(-14).map(m => ({ role: m.role, content: m.content }))
