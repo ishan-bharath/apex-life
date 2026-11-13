@@ -1,6 +1,6 @@
 const CACHE_NAME = 'apex-life-v2';
 const ASSETS = [
-  './apex-life.html',
+  './index.html',
   './manifest.json',
 ];
 
