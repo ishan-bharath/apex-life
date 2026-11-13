@@ -2,7 +2,7 @@
   "name": "APEX LIFE",
   "short_name": "APEX",
   "description": "Ishan's Summer 2026 tracker — schedule, workouts, projects, AI coach",
-  "start_url": "./apex-life.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f0e0c",
   "theme_color": "#0f0e0c",
